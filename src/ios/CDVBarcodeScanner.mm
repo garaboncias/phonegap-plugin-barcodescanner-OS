@@ -213,7 +213,13 @@
 
     processor.isTransitionAnimated = !disableAnimations;
 
-    processor.formats = options[@"formats"];
+    NSString *format = options[@"formats"];
+
+    if ([[format lowercaseString] isEqualToString:@"all"]) {
+        processor.formats = nil;
+    } else {
+        processor.formats = options[@"formats"];
+    }
 
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
 }
@@ -251,12 +257,10 @@
 
 //--------------------------------------------------------------------------
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback{
-    NSNumber* cancelledNumber = @(cancelled ? 1 : 0);
-
     NSMutableDictionary* resultDict = [NSMutableDictionary new];
     resultDict[@"text"] = scannedText;
     resultDict[@"format"] = format;
-    resultDict[@"cancelled"] = cancelledNumber;
+    resultDict[@"cancelled"] = cancelled ? @YES : @NO;
 
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_OK
